@@ -1,1 +1,0 @@
-# The-Strike-Group
