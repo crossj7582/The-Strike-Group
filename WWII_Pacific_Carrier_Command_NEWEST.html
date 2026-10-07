@@ -1,0 +1,5249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>WWII Pacific Carrier Command</title>
+
+<style>
+
+/* =========================================================
+   WWII PACIFIC CARRIER COMMAND
+   Historical-document visual system
+   ========================================================= */
+
+:root{
+    --paper:#e8dfc8;
+    --paper-dark:#d0c4a5;
+    --paper-light:#f3ead5;
+
+    --ink:#20241f;
+    --ink-soft:#4b5047;
+
+    --navy:#263d45;
+    --navy-dark:#172a30;
+
+    --olive:#59634d;
+    --olive-dark:#3d4838;
+
+    --red:#7a3028;
+    --red-dark:#531f1b;
+
+    --gold:#b28b32;
+
+    --line:#716c5a;
+    --line-light:#aaa18a;
+
+    --blue:#657f88;
+
+    --success:#3d5c42;
+
+    --shadow:0 5px 18px rgba(0,0,0,.18);
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:
+        linear-gradient(rgba(90,82,62,.08) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(90,82,62,.05) 1px,transparent 1px),
+        #9a9380;
+    background-size:22px 22px;
+    color:var(--ink);
+    font-family:Georgia,"Times New Roman",serif;
+}
+
+/* ---------------------------------------------------------
+   MAIN DOCUMENT
+   --------------------------------------------------------- */
+
+#app{
+    width:min(1400px,96vw);
+    margin:20px auto;
+    background:var(--paper);
+    min-height:calc(100vh - 40px);
+    border:1px solid #4f4a3c;
+    box-shadow:var(--shadow);
+    position:relative;
+}
+
+#app:before{
+    content:"";
+    position:absolute;
+    inset:8px;
+    border:1px solid rgba(70,65,50,.25);
+    pointer-events:none;
+}
+
+.document{
+    position:relative;
+    z-index:2;
+    padding:18px;
+}
+
+/* ---------------------------------------------------------
+   DOCUMENT HEADER
+   --------------------------------------------------------- */
+
+.document-header{
+    border-top:5px solid var(--navy-dark);
+    border-bottom:3px double var(--ink);
+    padding:8px 5px 10px;
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+}
+
+.header-left{
+    min-width:0;
+}
+
+.classification{
+    font-family:monospace;
+    font-size:10px;
+    font-weight:bold;
+    letter-spacing:.12em;
+    color:var(--red);
+}
+
+.header-title{
+    font-family:monospace;
+    font-weight:900;
+    font-size:25px;
+    letter-spacing:.04em;
+    margin-top:4px;
+}
+
+.header-subtitle{
+    font-family:monospace;
+    font-size:11px;
+    margin-top:4px;
+}
+
+.header-right{
+    text-align:right;
+    font-family:monospace;
+    font-size:10px;
+    min-width:180px;
+}
+
+.stamp{
+    display:inline-block;
+    border:2px solid var(--red);
+    color:var(--red);
+    padding:5px 9px;
+    transform:rotate(-2deg);
+    font-weight:bold;
+    letter-spacing:.1em;
+    margin-bottom:5px;
+}
+
+/* ---------------------------------------------------------
+   GAME LAYOUT
+   --------------------------------------------------------- */
+
+.game-layout{
+    display:grid;
+    grid-template-columns:260px minmax(0,1fr);
+    gap:14px;
+    margin-top:14px;
+}
+
+/* ---------------------------------------------------------
+   COMMAND BOARD
+   --------------------------------------------------------- */
+
+.command-board{
+    background:#d5cab0;
+    border:1px solid var(--line);
+    padding:10px;
+    align-self:start;
+    position:sticky;
+    top:10px;
+}
+
+.board-title{
+    font-family:monospace;
+    font-weight:900;
+    font-size:12px;
+    letter-spacing:.1em;
+    border-bottom:1px solid var(--line);
+    padding-bottom:7px;
+    margin-bottom:8px;
+}
+
+.board-note{
+    font-family:monospace;
+    font-size:9px;
+    line-height:1.4;
+    margin-bottom:10px;
+}
+
+.mission-list{
+    display:grid;
+    gap:5px;
+}
+
+.mission-button{
+    border:1px solid var(--line);
+    background:#e7dfc9;
+    color:var(--ink);
+    text-align:left;
+    padding:8px;
+    cursor:pointer;
+    font-family:monospace;
+    transition:.15s;
+}
+
+.mission-button:hover{
+    background:#d8ceb5;
+}
+
+.mission-button.active{
+    border-left:6px solid var(--navy);
+    background:#cfc4a6;
+}
+
+.mission-button.complete{
+    border-left:6px solid var(--success);
+}
+
+.mission-button.locked{
+    opacity:.42;
+    cursor:not-allowed;
+}
+
+.mission-code{
+    font-weight:900;
+    font-size:12px;
+}
+
+.mission-name{
+    font-size:10px;
+    margin-top:2px;
+}
+
+.mission-status{
+    font-size:8px;
+    margin-top:4px;
+    color:var(--ink-soft);
+}
+
+.board-score{
+    margin-top:10px;
+    border-top:1px solid var(--line);
+    padding-top:9px;
+}
+
+.score-row{
+    display:flex;
+    justify-content:space-between;
+    font-family:monospace;
+    font-size:10px;
+    padding:3px 0;
+}
+
+.score-row strong{
+    font-size:13px;
+}
+
+/* ---------------------------------------------------------
+   MAIN CONTENT
+   --------------------------------------------------------- */
+
+.main{
+    min-width:0;
+}
+
+.paper-panel{
+    background:var(--paper-light);
+    border:1px solid var(--line);
+    padding:14px;
+    box-shadow:0 2px 5px rgba(0,0,0,.07);
+    margin-bottom:12px;
+}
+
+.panel-heading{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:7px;
+    margin-bottom:10px;
+}
+
+.panel-heading h2{
+    margin:0;
+    font-family:monospace;
+    font-size:15px;
+    letter-spacing:.05em;
+}
+
+.panel-code{
+    font-family:monospace;
+    font-size:10px;
+    color:var(--red);
+    font-weight:bold;
+}
+
+/* ---------------------------------------------------------
+   OPENING PAGE
+   --------------------------------------------------------- */
+
+.opening-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+.opening-image{
+    width:100%;
+    height:390px;
+    object-fit:cover;
+    filter:grayscale(100%) contrast(1.05);
+    border:5px solid #4c493e;
+    background:#888;
+}
+
+.image-caption{
+    font-family:monospace;
+    font-size:8px;
+    line-height:1.35;
+    margin-top:5px;
+    color:#555044;
+}
+
+.document-text{
+    font-size:15px;
+    line-height:1.55;
+}
+
+.document-text p{
+    margin:0 0 12px;
+}
+
+.directive-box{
+    border:2px solid var(--ink);
+    background:#ded3b8;
+    padding:12px;
+    margin-top:12px;
+}
+
+.directive-label{
+    font-family:monospace;
+    font-size:9px;
+    font-weight:bold;
+    letter-spacing:.12em;
+    color:var(--red);
+}
+
+.directive{
+    font-family:monospace;
+    font-size:13px;
+    line-height:1.5;
+    margin-top:6px;
+}
+
+.signature{
+    font-family:cursive;
+    font-size:24px;
+    margin-top:12px;
+}
+
+.warning{
+    background:#e1d4b5;
+    border-left:5px solid var(--red);
+    padding:9px;
+    font-family:monospace;
+    font-size:10px;
+    line-height:1.4;
+}
+
+/* ---------------------------------------------------------
+   MISSION BRIEF
+   --------------------------------------------------------- */
+
+.mission-brief{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 300px;
+    gap:14px;
+}
+
+.brief-label{
+    font-family:monospace;
+    font-size:9px;
+    color:var(--red);
+    font-weight:bold;
+    letter-spacing:.1em;
+}
+
+.brief-title{
+    font-size:25px;
+    font-weight:bold;
+    margin:3px 0 8px;
+}
+
+.brief-text{
+    font-size:14px;
+    line-height:1.48;
+}
+
+.radio-box{
+    background:#d3c8aa;
+    border:1px dashed var(--line);
+    padding:9px;
+    margin-top:10px;
+    font-family:monospace;
+    font-size:11px;
+    line-height:1.45;
+}
+
+.radio-box:before{
+    content:"RADIO CIRCUIT // ";
+    color:var(--red);
+    font-weight:bold;
+}
+
+.brief-image{
+    width:100%;
+    height:190px;
+    object-fit:cover;
+    filter:grayscale(100%);
+    border:3px solid #4e4b40;
+}
+
+/* ---------------------------------------------------------
+   CHOICES
+   --------------------------------------------------------- */
+
+.choices{
+    display:grid;
+    gap:7px;
+    margin-top:12px;
+}
+
+.choice{
+    background:#ebe3cf;
+    border:1px solid var(--line);
+    padding:11px;
+    cursor:pointer;
+    text-align:left;
+    font-size:13px;
+    line-height:1.35;
+}
+
+.choice:hover{
+    background:#d9ceb3;
+}
+
+.choice.selected{
+    background:#c7bea5;
+    border:2px solid var(--navy);
+}
+
+.choice.correct{
+    background:#cbd7c5;
+    border-color:var(--success);
+}
+
+.choice.incorrect{
+    background:#dfc3bc;
+    border-color:var(--red);
+}
+
+.choice:disabled{
+    cursor:default;
+}
+
+/* ---------------------------------------------------------
+   ACTION BUTTON
+   --------------------------------------------------------- */
+
+.action{
+    margin-top:10px;
+    background:var(--navy);
+    color:#eee7d4;
+    border:2px solid var(--navy-dark);
+    padding:10px 15px;
+    cursor:pointer;
+    font-family:monospace;
+    font-weight:bold;
+    letter-spacing:.05em;
+}
+
+.action:hover{
+    background:var(--navy-dark);
+}
+
+.action:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+}
+
+/* ---------------------------------------------------------
+   HISTORICAL CARRIER DIAGRAM
+   --------------------------------------------------------- */
+
+.diagram-wrap{
+    position:relative;
+    border:2px solid var(--ink);
+    background:#f0e8d5;
+    overflow:hidden;
+}
+
+.diagram-wrap img{
+    width:100%;
+    display:block;
+}
+
+.diagram-hotspot{
+    position:absolute;
+    border:2px solid transparent;
+    background:rgba(190,145,50,.03);
+    cursor:pointer;
+}
+
+.diagram-hotspot:hover{
+    border-color:var(--gold);
+    background:rgba(190,145,50,.16);
+}
+
+.diagram-hotspot.selected{
+    border-color:var(--red);
+    background:rgba(125,48,40,.2);
+}
+
+.diagram-label{
+    font-family:monospace;
+    font-size:9px;
+    margin-top:6px;
+}
+
+/* ---------------------------------------------------------
+   SHIP IDENTIFICATION
+   --------------------------------------------------------- */
+
+.ship-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+}
+
+.ship-card{
+    border:1px solid var(--line);
+    background:#e5dcc5;
+    cursor:pointer;
+}
+
+.ship-card:hover{
+    outline:2px solid var(--gold);
+}
+
+.ship-card img{
+    width:100%;
+    height:120px;
+    object-fit:cover;
+    filter:grayscale(100%);
+}
+
+.ship-card .ship-name{
+    font-family:monospace;
+    font-weight:bold;
+    font-size:10px;
+    padding:6px;
+}
+
+.ship-card .ship-role{
+    font-size:10px;
+    padding:0 6px 7px;
+}
+
+/* ---------------------------------------------------------
+   NAVIGATION MAP
+   --------------------------------------------------------- */
+
+.map-container{
+    position:relative;
+    border:2px solid var(--ink);
+    overflow:hidden;
+    background:#b9ae91;
+}
+
+.map-container img{
+    width:100%;
+    display:block;
+    filter:sepia(.15) contrast(.95);
+}
+
+.map-point{
+    position:absolute;
+    width:25px;
+    height:25px;
+    border-radius:50%;
+    border:2px solid var(--red);
+    background:rgba(235,220,176,.85);
+    color:var(--red);
+    font-family:monospace;
+    font-size:10px;
+    font-weight:bold;
+    cursor:pointer;
+    transform:translate(-50%,-50%);
+}
+
+.map-point.selected{
+    background:var(--red);
+    color:white;
+}
+
+/* ---------------------------------------------------------
+   AIRCRAFT MANAGEMENT
+   --------------------------------------------------------- */
+
+.aircraft-table{
+    width:100%;
+    border-collapse:collapse;
+    font-family:monospace;
+    font-size:11px;
+}
+
+.aircraft-table th,
+.aircraft-table td{
+    border:1px solid var(--line);
+    padding:7px;
+    text-align:center;
+}
+
+.aircraft-table th{
+    background:#cec3a5;
+}
+
+.number-control{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+}
+
+.number-control button{
+    width:27px;
+    height:27px;
+    border:1px solid var(--line);
+    background:#ded4ba;
+    cursor:pointer;
+}
+
+.number-control span{
+    width:28px;
+    font-weight:bold;
+}
+
+/* ---------------------------------------------------------
+   FORMATION BOARD
+   --------------------------------------------------------- */
+
+.formation-board{
+    position:relative;
+    height:410px;
+    background:
+        radial-gradient(circle at center,
+        rgba(230,220,185,.75) 0 13%,
+        transparent 13.5%),
+        repeating-radial-gradient(circle at center,
+        transparent 0 42px,
+        rgba(50,60,58,.15) 43px 44px),
+        #8ba0a0;
+    border:2px solid var(--ink);
+    overflow:hidden;
+}
+
+.formation-grid{
+    position:absolute;
+    inset:0;
+    background:
+        linear-gradient(rgba(30,40,38,.14) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(30,40,38,.14) 1px,transparent 1px);
+    background-size:50px 50px;
+}
+
+.ship-token{
+    position:absolute;
+    min-width:74px;
+    padding:7px;
+    background:#e7dec7;
+    border:2px solid var(--navy-dark);
+    text-align:center;
+    font-family:monospace;
+    font-size:9px;
+    font-weight:bold;
+    cursor:grab;
+    user-select:none;
+}
+
+.ship-token.carrier{
+    width:120px;
+    background:#d4c7a7;
+}
+
+.ship-token.cruiser{
+    background:#cbd0c5;
+}
+
+.ship-token.destroyer{
+    background:#bfc9c5;
+}
+
+/* ---------------------------------------------------------
+   FINAL BATTLE
+   --------------------------------------------------------- */
+
+.battle-status{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+}
+
+.force-box{
+    border:1px solid var(--line);
+    background:#ded4ba;
+    padding:9px;
+}
+
+.force-title{
+    font-family:monospace;
+    font-weight:bold;
+    font-size:11px;
+}
+
+.force-value{
+    font-family:monospace;
+    font-size:18px;
+    font-weight:bold;
+    margin-top:3px;
+}
+
+.command-clock{
+    text-align:center;
+    font-family:monospace;
+    font-weight:bold;
+    font-size:42px;
+    border:3px double var(--red);
+    padding:7px;
+    margin:10px 0;
+    color:var(--red);
+}
+
+.command-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:6px;
+}
+
+.command-button{
+    padding:10px 5px;
+    background:#d8ceb3;
+    border:1px solid var(--line);
+    cursor:pointer;
+    font-family:monospace;
+    font-size:10px;
+    font-weight:bold;
+}
+
+.command-button:hover{
+    background:#c7bda4;
+}
+
+.command-button.selected{
+    background:var(--navy);
+    color:white;
+}
+
+.battle-log{
+    background:#d1c6a9;
+    border:1px solid var(--line);
+    height:150px;
+    overflow:auto;
+    padding:8px;
+    font-family:monospace;
+    font-size:10px;
+    line-height:1.5;
+    margin-top:10px;
+}
+
+/* ---------------------------------------------------------
+   EVALUATION
+   --------------------------------------------------------- */
+
+.evaluation{
+    border:3px double var(--ink);
+    padding:15px;
+    background:#e4dac1;
+}
+
+.rating{
+    font-family:monospace;
+    font-size:24px;
+    font-weight:bold;
+    color:var(--navy-dark);
+    margin:8px 0;
+}
+
+.eval-table{
+    width:100%;
+    border-collapse:collapse;
+    font-family:monospace;
+    font-size:11px;
+}
+
+.eval-table td{
+    border-bottom:1px dotted var(--line);
+    padding:5px;
+}
+
+/* ---------------------------------------------------------
+   FOOTER
+   --------------------------------------------------------- */
+
+.sources{
+    font-family:monospace;
+    font-size:8px;
+    line-height:1.4;
+    color:#5d5748;
+}
+
+.hidden{
+    display:none!important;
+}
+
+@media(max-width:950px){
+
+    .game-layout{
+        grid-template-columns:1fr;
+    }
+
+    .command-board{
+        position:relative;
+        top:0;
+    }
+
+    .mission-brief,
+    .opening-grid{
+        grid-template-columns:1fr;
+    }
+
+    .ship-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .command-grid{
+        grid-template-columns:repeat(3,1fr);
+    }
+}
+
+
+
+/* =========================================================
+   CARRIER IDENTIFICATION — MISSION A
+   ========================================================= */
+
+.carrier-score-panel{
+    margin-top:12px;
+    padding:10px;
+    border:2px solid var(--ink);
+    background:#d8ceb3;
+    text-align:center;
+    font-family:monospace;
+}
+
+.carrier-score-title{
+    font-size:9px;
+    letter-spacing:.12em;
+    color:var(--red);
+    font-weight:bold;
+}
+
+.carrier-score{
+    font-size:28px;
+    font-weight:bold;
+    margin:3px 0;
+}
+
+#carrierStatus{
+    font-size:10px;
+    font-weight:bold;
+}
+
+.carrier-game{
+    margin-top:14px;
+}
+
+.carrier-instructions{
+    border:1px dashed var(--line);
+    background:#ded3b8;
+    padding:9px;
+    font-family:monospace;
+    font-size:10px;
+    line-height:1.4;
+    margin-bottom:10px;
+}
+
+.carrier-interactive{
+    position:relative;
+    width:100%;
+    border:3px solid var(--ink);
+    background:#ece4d0;
+    overflow:hidden;
+}
+
+.carrier-interactive img{
+    width:100%;
+    display:block;
+    filter:grayscale(100%) sepia(.12) contrast(1.05);
+}
+
+.carrier-target{
+    position:absolute;
+    border:2px dashed rgba(122,48,40,.35);
+    background:rgba(178,139,50,.05);
+    cursor:pointer;
+    transition:background .15s,border .15s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:3px;
+}
+
+.carrier-target span{
+    opacity:0;
+    font-family:monospace;
+    font-size:9px;
+    font-weight:bold;
+    color:white;
+    background:rgba(38,61,69,.9);
+    padding:4px 6px;
+    pointer-events:none;
+}
+
+.carrier-target:hover{
+    border-color:var(--gold);
+    background:rgba(178,139,50,.18);
+}
+
+.carrier-target:hover span{
+    opacity:1;
+}
+
+.carrier-target.drag-over{
+    border:3px solid var(--gold);
+    background:rgba(178,139,50,.25);
+    box-shadow:0 0 0 3px rgba(178,139,50,.25);
+}
+
+.carrier-target.correct{
+    border:3px solid var(--success);
+    background:rgba(61,92,66,.20);
+}
+
+.carrier-target.correct span{
+    opacity:1;
+    background:rgba(61,92,66,.9);
+}
+
+.label-bank{
+    margin-top:12px;
+    border:2px solid var(--ink);
+    background:#d4c8aa;
+    padding:10px;
+}
+
+.label-bank-title{
+    font-family:monospace;
+    font-size:10px;
+    font-weight:bold;
+    letter-spacing:.1em;
+    color:var(--red);
+    border-bottom:1px solid var(--line);
+    padding-bottom:6px;
+    margin-bottom:8px;
+}
+
+.carrier-labels{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:7px;
+}
+
+.carrier-location-card{
+    background:#ebe3cf;
+    border:2px solid var(--line);
+    padding:9px;
+    text-align:center;
+    font-family:monospace;
+    font-size:10px;
+    font-weight:bold;
+    cursor:grab;
+    user-select:none;
+    transition:transform .12s,background .12s,border .12s;
+}
+
+.carrier-location-card:hover{
+    background:#dcd2b8;
+    border-color:var(--gold);
+    transform:translateY(-2px);
+}
+
+.carrier-location-card.selected{
+    background:var(--navy);
+    color:white;
+    border-color:var(--navy-dark);
+    transform:translateY(-2px);
+}
+
+.carrier-location-card.placed{
+    background:#cbd7c5;
+    color:var(--success);
+    border-color:var(--success);
+    cursor:default;
+    opacity:.55;
+    text-decoration:line-through;
+}
+
+.carrier-feedback{
+    margin-top:10px;
+    min-height:30px;
+}
+
+@media(max-width:700px){
+    .carrier-labels{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .carrier-location-card{
+        font-size:9px;
+        padding:8px 4px;
+    }
+
+    .carrier-target span{
+        font-size:7px;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div id="app">
+
+<div class="document">
+
+
+<!-- =====================================================
+     DOCUMENT HEADER
+     ===================================================== -->
+
+<header class="document-header">
+
+<div class="header-left">
+
+<div class="classification">
+UNITED STATES PACIFIC FLEET • COMMAND TRAINING DOCUMENT
+</div>
+
+<div class="header-title">
+WWII PACIFIC CARRIER COMMAND
+</div>
+
+<div class="header-subtitle">
+CARRIER COMMAND QUALIFICATION • JANUARY 1942
+</div>
+
+</div>
+
+<div class="header-right">
+
+<div class="stamp">
+TRAINING COPY
+</div>
+
+<div>
+PACIFIC FLEET
+</div>
+
+<div>
+COMMANDER TRAINING DIVISION
+</div>
+
+<div>
+DOCUMENT NO. PC-42-CQ
+</div>
+
+</div>
+
+</header>
+
+
+<div class="game-layout">
+
+
+<!-- =====================================================
+     COMMAND BOARD
+     ===================================================== -->
+
+<aside class="command-board">
+
+<div class="board-title">
+CARRIER COMMAND QUALIFICATIONS
+</div>
+
+<div class="board-note">
+
+Complete Mission A first.
+
+After qualification of Mission A,
+the remaining missions may be completed
+in any order.
+
+Each qualification mission is scored
+from 0–10.
+
+8–10 = QUALIFIED
+
+</div>
+
+<div
+id="missionList"
+class="mission-list">
+</div>
+
+
+<div class="board-score">
+
+<div class="score-row">
+<span>COMMAND SCORE</span>
+<strong id="totalScore">0</strong>
+</div>
+
+<div class="score-row">
+<span>MISSIONS PASSED</span>
+<strong id="passed">0</strong>
+</div>
+
+<div class="score-row">
+<span>STATUS</span>
+<strong id="qualification">NOT QUALIFIED</strong>
+</div>
+
+</div>
+
+</aside>
+
+
+<!-- =====================================================
+     MAIN CONTENT
+     ===================================================== -->
+
+<main class="main">
+
+<div id="content"></div>
+
+</main>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   WWII PACIFIC CARRIER COMMAND
+   ========================================================= */
+
+const content = document.getElementById("content");
+const missionList = document.getElementById("missionList");
+
+let currentMission = "OPENING";
+
+const state = {
+
+    score: {},
+
+    completed: {},
+
+    totalScore: 0,
+
+    aircraft: {
+
+        fighter:12,
+
+        dive:18,
+
+        torpedo:12
+
+    },
+
+    carrier:100,
+
+    fuel:100,
+
+    intelligence:50,
+
+    enemyCarriers:4,
+
+    enemyAircraft:40,
+
+    americanAircraft:42,
+
+    battleRound:0,
+
+    battleCommands:[],
+
+    battleTimer:null,
+
+    battleSeconds:20
+
+};
+
+
+/* =========================================================
+   HISTORICAL IMAGE LIBRARY
+
+   These are period photographs / official drawings,
+   not generated illustrations.
+   ========================================================= */
+
+const IMG = {
+
+    nimitz:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Adm_Nimitz_presents_awards_on_USS_Enterprise_(CV-6)_1942.jpeg",
+
+    arizona:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/USS_Arizona_burning_after_Japanese_attack_on_Pearl_Harbor_7_December_1941.jpg",
+
+    enterprise:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/USS_Enterprise_(CV-6)_flight_deck_April_1942.jpeg",
+
+    yorktown:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/USS_Yorktown_(CV-5)_underway_at_Midway_1942.jpg",
+
+    carrierCutaway:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Yorktown-class_aircraft_carrier_cutaway_1942.png",
+
+    sbd:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Douglas_SBD_in_flight_1942.jpg",
+
+    wildcat:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Grumman_F4F_Wildcat_in_flight,_February_1942.jpg",
+
+    tbd:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/TBD-1_Devastator_of_VT-4_taking_off_from_USS_Ranger_(CV-4)_in_1942.jpg",
+
+    northCarolina:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/USS_North_Carolina.jpg",
+
+    atlanta:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/USS_Atlanta_(CL-51)_at_Pearl_Harbor_in_May_1942.jpg",
+
+    fletcher:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/USS_Fletcher_(DD-445)_off_New_York_in_1942.jpg",
+
+    zuikaku:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Japanese_aircraft_carrier_Zuikaku.jpg",
+
+    shokaku:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Shokaku_under_attack_8_May_1942B.jpg",
+
+    hiryu:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Japanese_aircraft_carrier_Hiryu_burning_on_5_June_1942_(NH_73064).jpg",
+
+    damage:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Flight_deck_of_USS_Yorktown_(CV-5)_after_damage_at_Midway_1942.jpg",
+
+    pacificMap:
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Dated_events_war_map_of_the_Pacific_and_Far_East,_1942.jpg"
+
+};
+
+
+/* =========================================================
+   MISSION DEFINITIONS
+   ========================================================= */
+
+const missions = [
+
+{
+
+    id:"A",
+
+    name:"KNOW YOUR CARRIER",
+
+    short:"Carrier identification",
+
+    intro:
+    "Before an officer commands the air group, he must understand the ship beneath it.",
+
+},
+
+{
+
+    id:"B",
+
+    name:"KNOW YOUR FLEET",
+
+    short:"Ship identification",
+
+},
+
+{
+
+    id:"C",
+
+    name:"NAVIGATION",
+
+    short:"Route selection",
+
+},
+
+{
+
+    id:"D",
+
+    name:"FLIGHT DECK OPERATIONS",
+
+    short:"Air group management",
+
+},
+
+{
+
+    id:"E",
+
+    name:"RECONNAISSANCE",
+
+    short:"Find the enemy",
+
+},
+
+{
+
+    id:"F",
+
+    name:"RADIO INTELLIGENCE",
+
+    short:"Interpret reports",
+
+},
+
+{
+
+    id:"G",
+
+    name:"STRIKE PLANNING",
+
+    short:"Concentrate force",
+
+},
+
+{
+
+    id:"H",
+
+    name:"CARRIER DEFENSE",
+
+    short:"Defensive CAP",
+
+},
+
+{
+
+    id:"I",
+
+    name:"TASK FORCE FORMATION",
+
+    short:"Layered protection",
+
+},
+
+{
+
+    id:"J",
+
+    name:"SURFACE THREAT",
+
+    short:"Protect the carrier",
+
+},
+
+{
+
+    id:"K",
+
+    name:"DAMAGE CONTROL",
+
+    short:"Crisis response",
+
+},
+
+{
+
+    id:"L",
+
+    name:"AIRCRAFT RECOVERY",
+
+    short:"Recover the air group",
+
+},
+
+{
+
+    id:"M",
+
+    name:"FINAL COMMAND",
+
+    short:"Pacific carrier battle",
+
+}
+
+];
+
+
+/* =========================================================
+   BOARD
+   ========================================================= */
+
+function renderBoard(){
+
+    missionList.innerHTML="";
+
+    missions.forEach(m=>{
+
+        const b=document.createElement("button");
+
+        b.className="mission-button";
+
+        if(currentMission===m.id)
+            b.classList.add("active");
+
+        if(state.completed[m.id])
+            b.classList.add("complete");
+
+        if(m.id!=="A" &&
+           !state.completed["A"])
+            b.classList.add("locked");
+
+        b.innerHTML=`
+
+            <div class="mission-code">
+                ${m.id}
+            </div>
+
+            <div class="mission-name">
+                ${m.name}
+            </div>
+
+            <div class="mission-status">
+
+                ${
+                    state.completed[m.id]
+                    ?
+                    "QUALIFIED • "+state.score[m.id]+"/10"
+                    :
+                    (
+                        m.id!=="A" &&
+                        !state.completed["A"]
+                        ?
+                        "LOCKED"
+                        :
+                        "NOT COMPLETED"
+                    )
+                }
+
+            </div>
+
+        `;
+
+        b.onclick=()=>{
+
+            if(m.id!=="A" &&
+               !state.completed["A"]){
+
+                alert(
+                    "MISSION A IS REQUIRED BEFORE THE QUALIFICATION BOARD OPENS."
+                );
+
+                return;
+            }
+
+            currentMission=m.id;
+
+            render();
+
+        };
+
+        missionList.appendChild(b);
+
+    });
+
+    updateScoreboard();
+
+}
+
+
+/* =========================================================
+   SCOREBOARD
+   ========================================================= */
+
+function updateScoreboard(){
+
+    document.getElementById("totalScore")
+        .textContent=state.totalScore;
+
+    document.getElementById("passed")
+        .textContent=
+        Object.values(state.score)
+        .filter(v=>v>=8).length;
+
+    const qualification=
+        missions
+        .filter(m=>m.id!=="M")
+        .every(m=>state.completed[m.id] &&
+                   state.score[m.id]>=8);
+
+    document.getElementById("qualification")
+        .textContent=
+        qualification
+        ?
+        "QUALIFIED"
+        :
+        "NOT QUALIFIED";
+
+}
+
+
+/* =========================================================
+   OPENING PAGE
+   ========================================================= */
+
+function renderOpening(){
+
+    content.innerHTML=`
+
+    <section class="paper-panel">
+
+        <div class="panel-heading">
+
+            <h2>
+                COMMANDER'S INITIAL BRIEFING
+            </h2>
+
+            <div class="panel-code">
+                CINCPAC // JAN 1942
+            </div>
+
+        </div>
+
+
+        <div class="opening-grid">
+
+            <div>
+
+                <img
+                    class="opening-image"
+                    src="${IMG.nimitz}"
+                    alt="Admiral Chester Nimitz aboard USS Enterprise in 1942">
+
+                <div class="image-caption">
+
+                    HISTORICAL PHOTOGRAPH —
+                    Admiral Chester W. Nimitz presents awards aboard
+                    USS Enterprise (CV-6), Pearl Harbor, 27 May 1942.
+                    U.S. Navy photograph.
+
+                </div>
+
+                <div class="signature">
+                    Chester W. Nimitz
+                </div>
+
+                <div class="mono">
+                    ADMIRAL, U.S. NAVY
+                    <br>
+                    COMMANDER IN CHIEF, U.S. PACIFIC FLEET
+                </div>
+
+            </div>
+
+
+            <div class="document-text">
+
+                <div class="brief-label">
+                    PACIFIC FLEET TRAINING DIRECTIVE
+                </div>
+
+                <div class="brief-title">
+                    THE PACIFIC HAS CHANGED.
+                </div>
+
+                <p>
+
+                    On 7 December 1941, Japanese forces attacked
+                    the United States Pacific Fleet at Pearl Harbor.
+
+                </p>
+
+                <p>
+
+                    The battleship had long been the centerpiece
+                    of American naval power. The opening months of
+                    this war have demonstrated something the Navy
+                    can no longer ignore:
+
+                    <strong>
+                    aircraft can find, strike, and defend the fleet
+                    at distances measured in hundreds of miles.
+                    </strong>
+
+                </p>
+
+                <div class="warning">
+
+                    THIS EXERCISE IS A COMMAND SIMULATION.
+
+                    The student is not being asked to memorize
+                    a battle. The student is being trained to
+                    understand the interconnected systems that
+                    make a carrier task force effective.
+
+                </div>
+
+
+                <div class="directive-box">
+
+                    <div class="directive-label">
+                        COMMANDER'S DIRECTIVE
+                    </div>
+
+                    <div class="directive">
+
+                        You are being evaluated for duty as a
+                        carrier strike commander.
+
+                        <br><br>
+
+                        You will be expected to understand:
+
+                        <br>
+                        • Navigation
+                        <br>
+                        • Ships and their capabilities
+                        <br>
+                        • Flight deck operations
+                        <br>
+                        • Reconnaissance
+                        <br>
+                        • Radio intelligence
+                        <br>
+                        • Aircraft employment
+                        <br>
+                        • Strike planning
+                        <br>
+                        • Fleet defense
+                        <br>
+                        • Damage control
+                        <br>
+                        • Aircraft recovery
+                        <br>
+                        • Command decisions
+
+                        <br><br>
+
+                        Your aircraft cannot fight effectively
+                        without intelligence.
+
+                        Your intelligence is useless without
+                        communications.
+
+                        Your communications cannot protect a
+                        carrier whose screen has failed.
+
+                        And the finest aircraft in the Pacific
+                        cannot save a commander who cannot decide
+                        what matters most.
+
+                    </div>
+
+                </div>
+
+
+                <div class="directive-box">
+
+                    <div class="directive-label">
+                        QUALIFICATION STANDARD
+                    </div>
+
+                    <div class="directive">
+
+                        10 — OUTSTANDING
+
+                        <br>
+
+                        8–9 — QUALIFIED
+
+                        <br>
+
+                        5–7 — NEEDS IMPROVEMENT
+
+                        <br>
+
+                        0–4 — RETRAIN
+
+                        <br><br>
+
+                        Complete Mission A first.
+
+                        Once qualified, the remaining missions
+                        may be completed in any order.
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="action"
+                    onclick="startTraining()">
+
+                    BEGIN CARRIER COMMAND TRAINING
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="paper-panel">
+
+        <div class="panel-heading">
+
+            <h2>
+                PEARL HARBOR — THE EVENT THAT STARTED THE TRAINING
+            </h2>
+
+        </div>
+
+        <div class="opening-grid">
+
+            <div>
+
+                <img
+                    class="opening-image"
+                    style="height:260px"
+                    src="${IMG.arizona}"
+                    alt="USS Arizona burning after Pearl Harbor">
+
+                <div class="image-caption">
+
+                    USS ARIZONA (BB-39) burning after the Japanese
+                    attack on Pearl Harbor, 7 December 1941.
+                    Official U.S. Navy photograph.
+
+                </div>
+
+            </div>
+
+            <div class="document-text">
+
+                <p>
+
+                    The Pacific Fleet suffered catastrophic
+                    battleship losses at Pearl Harbor.
+
+                </p>
+
+                <p>
+
+                    But the aircraft carriers that would become
+                    central to the Pacific war were not present
+                    in Battleship Row when the attack began.
+
+                </p>
+
+                <p>
+
+                    That circumstance did not magically make
+                    the battleship obsolete. It did, however,
+                    sharpen the Navy's understanding of the
+                    carrier's value as a mobile aviation base.
+
+                </p>
+
+                <p>
+
+                    Your job is to learn how to command that
+                    system.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    `;
+
+}
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+function startTraining(){
+
+    currentMission="A";
+
+    render();
+
+}
+
+
+/* =========================================================
+   MISSION A
+   ========================================================= */
+
+function renderA(){
+
+    content.innerHTML=`
+
+    <section class="paper-panel">
+
+        <div class="panel-heading">
+            <h2>MISSION A — CARRIER QUALIFICATION</h2>
+            <div class="panel-code">KNOW YOUR CARRIER</div>
+        </div>
+
+        <div class="mission-brief">
+            <div>
+                <div class="brief-label">CARRIER COMMANDER TRAINING</div>
+                <div class="brief-title">KNOW YOUR CARRIER</div>
+                <div class="brief-text">
+                    Before you command aircraft, escorts, or strikes,
+                    you must understand the ship itself.
+                    <br><br>
+                    This qualification exercise uses a historical
+                    Yorktown-class carrier cutaway. Move each location
+                    card to the correct position on the carrier.
+                    <br><br>
+                    You may <strong>drag</strong> a card to a location,
+                    or click a card and then click the correct location.
+                </div>
+                <div class="radio-box">
+                    "Captain, identify the critical stations aboard your carrier."
+                </div>
+            </div>
+
+            <div>
+                <div class="directive-box">
+                    <div class="directive-label">QUALIFICATION STANDARD</div>
+                    <div class="directive">
+                        Identify all nine locations.
+                        <br><br>
+                        <strong>8 or more correct = QUALIFIED</strong>
+                        <br>
+                        7 or fewer = RETRAIN
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="carrier-score-panel">
+            <div class="carrier-score-title">CARRIER IDENTIFICATION SCORE</div>
+            <div class="carrier-score"><strong id="carrierCorrect">0</strong> / 9</div>
+            <div id="carrierStatus">IDENTIFICATION IN PROGRESS</div>
+        </div>
+
+        <div id="carrierGame" class="carrier-game">
+            <div class="carrier-instructions">
+                <strong>COMMAND ORDERS:</strong>
+                Drag each location card onto the correct position on the carrier.
+                <br>
+                If using a mouse or trackpad without drag support, click a card,
+                then click the target location.
+            </div>
+
+            <div id="carrierDiagram" class="carrier-interactive">
+                <img
+                    src="${IMG.carrierCutaway}"
+                    alt="Historical Yorktown-class aircraft carrier cutaway">
+
+                <div class="carrier-target" data-location="flight deck"
+                     style="left:5%;top:8%;width:76%;height:12%;">
+                    <span>FLIGHT DECK</span>
+                </div>
+
+                <div class="carrier-target" data-location="island"
+                     style="left:66%;top:3%;width:13%;height:25%;">
+                    <span>ISLAND</span>
+                </div>
+
+                <div class="carrier-target" data-location="bridge"
+                     style="left:69%;top:8%;width:8%;height:9%;">
+                    <span>BRIDGE</span>
+                </div>
+
+                <div class="carrier-target" data-location="arresting gear"
+                     style="left:5%;top:16%;width:18%;height:10%;">
+                    <span>ARRESTING GEAR</span>
+                </div>
+
+                <div class="carrier-target" data-location="elevators"
+                     style="left:14%;top:18%;width:13%;height:19%;">
+                    <span>ELEVATORS</span>
+                </div>
+
+                <div class="carrier-target" data-location="hangar deck"
+                     style="left:20%;top:32%;width:52%;height:17%;">
+                    <span>HANGAR DECK</span>
+                </div>
+
+                <div class="carrier-target" data-location="propulsion system"
+                     style="left:38%;top:55%;width:25%;height:24%;">
+                    <span>PROPULSION SYSTEM</span>
+                </div>
+
+                <div class="carrier-target" data-location="torpedo bulge"
+                     style="left:14%;top:69%;width:27%;height:14%;">
+                    <span>TORPEDO BULGE</span>
+                </div>
+
+                <div class="carrier-target" data-location="anti-aircraft guns"
+                     style="left:76%;top:27%;width:15%;height:20%;">
+                    <span>ANTI-AIRCRAFT GUNS</span>
+                </div>
+            </div>
+
+            <div class="label-bank">
+                <div class="label-bank-title">LOCATION IDENTIFICATION CARDS</div>
+                <div id="carrierLabels" class="carrier-labels"></div>
+            </div>
+        </div>
+
+        <div id="carrierFeedback" class="carrier-feedback">
+            Select a location card and place it on the carrier.
+        </div>
+
+        <button class="action" id="carrierReset" onclick="resetCarrierGame()">
+            RESET TRAINING
+        </button>
+
+        <button class="action" id="carrierComplete"
+                onclick="completeCarrierMission()" disabled>
+            COMPLETE CARRIER QUALIFICATION
+        </button>
+
+    </section>
+    `;
+
+    const locations=[
+        "island",
+        "flight deck",
+        "arresting gear",
+        "elevators",
+        "propulsion system",
+        "hangar deck",
+        "torpedo bulge",
+        "anti-aircraft guns",
+        "bridge"
+    ];
+
+    let correct=0;
+    let selectedLabel=null;
+
+    const labels=document.getElementById("carrierLabels");
+    const targets=document.querySelectorAll(".carrier-target");
+
+    locations.sort(()=>Math.random()-.5).forEach(location=>{
+        const card=document.createElement("div");
+        card.className="carrier-location-card";
+        card.draggable=true;
+        card.dataset.location=location;
+        card.textContent=location.toUpperCase();
+
+        card.onclick=()=>{
+            document.querySelectorAll(".carrier-location-card")
+                .forEach(x=>x.classList.remove("selected"));
+            card.classList.add("selected");
+            selectedLabel=card;
+            document.getElementById("carrierFeedback").textContent=
+                "SELECTED: "+location.toUpperCase()+
+                ". Click the correct location on the carrier.";
+        };
+
+        card.ondragstart=(event)=>{
+            selectedLabel=card;
+            event.dataTransfer.setData("text/plain",location);
+        };
+
+        labels.appendChild(card);
+    });
+
+    targets.forEach(target=>{
+        target.ondragover=(event)=>{
+            event.preventDefault();
+            target.classList.add("drag-over");
+        };
+
+        target.ondragleave=()=>target.classList.remove("drag-over");
+
+        target.ondrop=(event)=>{
+            event.preventDefault();
+            target.classList.remove("drag-over");
+            const location=event.dataTransfer.getData("text/plain");
+            placeCarrierLabel(location,target);
+        };
+
+        target.onclick=()=>{
+            if(!selectedLabel) return;
+            placeCarrierLabel(selectedLabel.dataset.location,target);
+        };
+    });
+
+    function placeCarrierLabel(location,target){
+        const correctLocation=target.dataset.location;
+
+        if(location===correctLocation){
+            if(target.classList.contains("correct")) return;
+
+            target.classList.add("correct");
+            target.querySelector("span").textContent=location.toUpperCase();
+
+            const card=document.querySelector(
+                `.carrier-location-card[data-location="${location}"]`
+            );
+
+            if(card){
+                card.classList.add("placed");
+                card.draggable=false;
+                card.onclick=null;
+            }
+
+            correct++;
+            document.getElementById("carrierCorrect").textContent=correct;
+            document.getElementById("carrierFeedback").innerHTML=`
+                <div class="directive-box">
+                    <div class="directive-label">LOCATION CONFIRMED</div>
+                    <div class="directive">
+                        <strong>${location.toUpperCase()}</strong> correctly identified.
+                        <br><br>
+                        CARRIER IDENTIFICATION: <strong>${correct}/9</strong>
+                    </div>
+                </div>
+            `;
+
+            selectedLabel=null;
+
+            if(correct>=8){
+                document.getElementById("carrierStatus").textContent=
+                    "QUALIFICATION STANDARD MET";
+                document.getElementById("carrierComplete").disabled=false;
+            }
+
+            if(correct===9){
+                document.getElementById("carrierStatus").textContent=
+                    "CARRIER FULLY IDENTIFIED";
+            }
+        }
+        else{
+            document.getElementById("carrierFeedback").innerHTML=`
+                <div class="warning">
+                    LOCATION REJECTED.
+                    <br><br>
+                    That is not the correct location for this component.
+                    Review the carrier structure and try again.
+                </div>
+            `;
+        }
+    }
+
+    window.resetCarrierGame=()=>renderA();
+
+    window.completeCarrierMission=()=>{
+        if(correct<8){
+            alert("QUALIFICATION STANDARD NOT MET. You must correctly identify at least 8 of the 9 locations.");
+            return;
+        }
+
+        let score=10;
+        if(correct===8) score=9;
+
+        awardMission("A",score);
+
+        document.getElementById("carrierFeedback").innerHTML=`
+            <div class="directive-box">
+                <div class="directive-label">MISSION A QUALIFIED</div>
+                <div class="directive">
+                    WELL DONE, CAPTAIN.
+                    <br><br>
+                    You have demonstrated proficiency in identifying
+                    critical carrier systems and operating spaces.
+                    <br><br>
+                    CARRIER IDENTIFICATION: <strong>${correct}/9</strong>
+                    <br><br>
+                    MISSION A SCORE: <strong>${score}/10</strong>
+                    <br><br>
+                    The remaining carrier command qualifications are now unlocked.
+                </div>
+            </div>
+        `;
+
+        document.getElementById("carrierComplete").disabled=true;
+        renderBoard();
+    };
+
+}
+
+
+/* =========================================================
+   MISSION B
+   ========================================================= */
+
+function renderB(){
+
+    content.innerHTML=`
+
+    <section class="paper-panel">
+
+        <div class="panel-heading">
+
+            <h2>
+                MISSION B — KNOW YOUR FLEET
+            </h2>
+
+            <div class="panel-code">
+                SHIP IDENTIFICATION
+            </div>
+
+        </div>
+
+        <div class="brief-text">
+
+            A carrier task force is not a collection of identical
+            ships.
+
+            Each type has a different tactical purpose.
+
+            Identify the ship type from the historical photograph
+            and then identify its principal role.
+
+        </div>
+
+
+        <div class="ship-grid">
+
+            <div class="ship-card"
+                 onclick="shipAnswer('carrier')">
+
+                <img src="${IMG.enterprise}">
+
+                <div class="ship-name">
+                    USS ENTERPRISE (CV-6)
+                </div>
+
+                <div class="ship-role">
+                    AIRCRAFT CARRIER
+                </div>
+
+            </div>
+
+
+            <div class="ship-card"
+                 onclick="shipAnswer('battleship')">
+
+                <img src="${IMG.northCarolina}">
+
+                <div class="ship-name">
+                    USS NORTH CAROLINA (BB-55)
+                </div>
+
+                <div class="ship-role">
+                    BATTLESHIP
+                </div>
+
+            </div>
+
+
+            <div class="ship-card"
+                 onclick="shipAnswer('cruiser')">
+
+                <img src="${IMG.atlanta}">
+
+                <div class="ship-name">
+                    USS ATLANTA (CL-51)
+                </div>
+
+                <div class="ship-role">
+                    LIGHT CRUISER
+                </div>
+
+            </div>
+
+
+            <div class="ship-card"
+                 onclick="shipAnswer('destroyer')">
+
+                <img src="${IMG.fletcher}">
+
+                <div class="ship-name">
+                    USS FLETCHER (DD-445)
+                </div>
+
+                <div class="ship-role">
+                    DESTROYER
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="directive-box"
+            id="shipQuestion">
+
+            <div class="directive-label">
+                FLAG BRIDGE QUESTION
+            </div>
+
+            <div class="directive">
+                Which ship is designed primarily to provide
+                long-range mobile naval aviation?
+            </div>
+
+        </div>
+
+    </section>
+
+    `;
+
+}
+
+
+let shipStep=0;
+
+function shipAnswer(answer){
+
+    const questions=[
+
+        {
+            q:"Which ship is designed primarily to provide long-range mobile naval aviation?",
+            a:"carrier"
+        },
+
+        {
+            q:"Which ship is the primary heavy surface combatant?",
+            a:"battleship"
+        },
+
+        {
+            q:"Which ship provides fast surface combat, scouting and gunfire/AA support?",
+            a:"cruiser"
+        },
+
+        {
+            q:"Which ship is especially suited to screening, escort, ASW and torpedo attack?",
+            a:"destroyer"
+        }
+
+    ];
+
+    if(answer===questions[shipStep].a){
+
+        shipStep++;
+
+        if(shipStep>=questions.length){
+
+            awardMission("B",10);
+
+            document.getElementById("shipQuestion")
+                .innerHTML=`
+
+                <div class="directive-label">
+                    MISSION B QUALIFIED
+                </div>
+
+                <div class="directive">
+                    You can distinguish the major surface
+                    combatants and understand their functions.
+
+                    <br><br>
+
+                    SCORE: <strong>10/10</strong>
+                </div>
+
+                `;
+
+            return;
+
+        }
+
+        document.getElementById("shipQuestion")
+            .innerHTML=`
+
+            <div class="directive-label">
+                CORRECT — NEXT REPORT
+            </div>
+
+            <div class="directive">
+                ${questions[shipStep].q}
+            </div>
+
+            `;
+
+    }
+
+    else{
+
+        alert(
+            "Negative. Review the ship's characteristics and try again."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   MISSION C
+   ========================================================= */
+
+function renderC(){
+
+    content.innerHTML=`
+
+    <section class="paper-panel">
+
+        <div class="panel-heading">
+
+            <h2>
+                MISSION C — NAVIGATION
+            </h2>
+
+            <div class="panel-code">
+                PACIFIC OPERATING AREA
+            </div>
+
+        </div>
+
+        <div class="brief-text">
+
+            Your force must reach a new operating area.
+
+            The route is not a simple shortest-distance problem.
+
+            You must balance:
+
+            <strong>
+            SPEED • FUEL • EXPOSURE
+            </strong>
+
+            Select the route point that best represents a
+            conservative approach toward a friendly operating
+            area while avoiding known enemy positions.
+
+        </div>
+
+
+        <div class="map-container">
+
+            <img src="${IMG.pacificMap}">
+
+            <button
+                class="map-point"
+                style="left:31%;top:47%"
+                onclick="navChoice(1)">
+                A
+            </button>
+
+            <button
+                class="map-point"
+                style="left:43%;top:39%"
+                onclick="navChoice(2)">
+                B
+            </button>
+
+            <button
+                class="map-point"
+                style="left:55%;top:48%"
+                onclick="navChoice(3)">
+                C
+            </button>
+
+            <button
+                class="map-point"
+                style="left:66%;top:60%"
+                onclick="navChoice(4)">
+                D
+            </button>
+
+        </div>
+
+
+        <div class="radio-box">
+
+            NAVIGATION: "Maintain a route that gives the
+            carrier force room to maneuver. Avoid unnecessary
+            exposure to known enemy operating areas."
+
+        </div>
+
+
+        <div id="navFeedback"></div>
+
+    </section>
+
+    `;
+
+}
+
+
+function navChoice(n){
+
+    const feedback=document.getElementById("navFeedback");
+
+    if(n===2){
+
+        awardMission("C",9);
+
+        feedback.innerHTML=`
+
+            <div class="directive-box">
+
+                <div class="directive-label">
+                    ROUTE ACCEPTED
+                </div>
+
+                <div class="directive">
+                    Good navigation judgment.
+
+                    You selected the route that balances
+                    distance, fuel and exposure.
+
+                    <br><br>
+
+                    SCORE: <strong>9/10</strong>
+
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+    else{
+
+        feedback.innerHTML=`
+
+            <div class="warning">
+
+                ROUTE REJECTED.
+
+                The route increases either exposure,
+                fuel consumption, or both.
+
+                Recalculate.
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   MISSION D
+   ========================================================= */
+
+function renderD(){
+
+    content.innerHTML=`
+
+    <section class="paper-panel">
+
+        <div class="panel-heading">
+
+            <h2>
+                MISSION D — FLIGHT DECK OPERATIONS
+            </h2>
+
+            <div class="panel-code">
+                0600 HOURS
+            </div>
+
+        </div>
+
+
+        <div class="mission-brief">
+
+            <div>
+
+                <div class="brief-text">
+
+                    The carrier is preparing to launch its
+                    aircraft.
+
+                    The air group consists of fighters,
+                    scout/dive bombers and torpedo aircraft.
+
+                    You cannot simply launch everything.
+
+                    Aircraft must also remain available for
+                    defense and later operations.
+
+                </div>
+
+                <div class="radio-box">
+
+                    "Flight deck reports launch conditions
+                    satisfactory. Captain, give the order."
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <img
+                    class="brief-image"
+                    src="${IMG.enterprise}">
+
+                <div class="image-caption">
+                    USS Enterprise flight deck, April 1942.
+                    SBDs and F4Fs visible.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <table class="aircraft-table">
+
+            <tr>
+                <th>TYPE</th>
+                <th>AVAILABLE</th>
+                <th>LAUNCH</th>
+                <th>REMAIN</th>
+            </tr>
+
+            <tr>
+                <td>F4F WILDCAT</td>
+                <td>12</td>
+                <td>
+                    <div class="number-control">
+                        <button onclick="adjustAir('fighter',-1)">−</button>
+                        <span id="fighterLaunch">0</span>
+                        <button onclick="adjustAir('fighter',1)">+</button>
+                    </div>
+                </td>
+                <td id="fighterRemain">12</td>
+            </tr>
+
+            <tr>
+                <td>SBD DAUNTLESS</td>
+                <td>18</td>
+                <td>
+                    <div class="number-control">
+                        <button onclick="adjustAir('dive',-1)">−</button>
+                        <span id="diveLaunch">0</span>
+                        <button onclick="adjustAir('dive',1)">+</button>
+                    </div>
+                </td>
+                <td id="diveRemain">18</td>
+            </tr>
+
+            <tr>
+                <td>TBD DEVASTATOR</td>
+                <td>12</td>
+                <td>
+                    <div class="number-control">
+                        <button onclick="adjustAir('torpedo',-1)">−</button>
+                        <span id="torpedoLaunch">0</span>
+                        <button onclick="adjustAir('torpedo',1)">+</button>
+                    </div>
+                </td>
+                <td id="torpedoRemain">12</td>
+            </tr>
+
+        </table>
+
+
+        <button
+            class="action"
+            onclick="submitFlightDeck()">
+
+            TRANSMIT LAUNCH ORDER
+
+        </button>
+
+
+        <div id="flightFeedback"></div>
+
+    </section>
+
+    `;
+
+}
+
+
+const launch={
+    fighter:0,
+    dive:0,
+    torpedo:0
+};
+
+
+function adjustAir(type,n){
+
+    const maximum={
+        fighter:12,
+        dive:18,
+        torpedo:12
+    };
+
+    launch[type]=Math.max(
+        0,
+        Math.min(
+            maximum[type],
+            launch[type]+n
+        )
+    );
+
+    document.getElementById(type+"Launch")
+        .textContent=launch[type];
+
+    document.getElementById(type+"Remain")
+        .textContent=
+        maximum[type]-launch[type];
+
+}
+
+
+function submitFlightDeck(){
+
+    const total=
+        launch.fighter+
+        launch.dive+
+        launch.torpedo;
+
+    const fightersRemain=
+        12-launch.fighter;
+
+    /*
+       Training standard:
+       preserve at least 4 fighters and
+       retain a meaningful strike package.
+    */
+
+    if(
+        fightersRemain>=4 &&
+        launch.dive>=8 &&
+        launch.torpedo>=4 &&
+        total>=16
+    ){
+
+        awardMission("D",10);
+
+        document.getElementById("flightFeedback")
+            .innerHTML=`
+
+            <div class="directive-box">
+
+                <div class="directive-label">
+                    LAUNCH ORDER ACCEPTED
+                </div>
+
+                <div class="directive">
+                    You preserved a defensive fighter
+                    reserve while putting a meaningful
+                    strike force into the air.
+
+                    <br><br>
+
+                    SCORE: <strong>10/10</strong>
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+    else{
+
+        document.getElementById("flightFeedback")
+            .innerHTML=`
+
+            <div class="warning">
+
+                LAUNCH ORDER REJECTED.
+
+                The air group has been distributed in a
+                manner that leaves either the strike force
+                or the carrier's defense inadequate.
+
+                Rework the launch order.
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   MISSION E
+   ========================================================= */
+
+function renderE(){
+
+    content.innerHTML=`
+
+    <section class="paper-panel">
+
+        <div class="panel-heading">
+
+            <h2>
+                MISSION E — RECONNAISSANCE
+            </h2>
+
+            <div class="panel-code">
+                0630 HOURS
+            </div>
+
+        </div>
+
+
+        <div class="brief-text">
+
+            Your radio operator receives the following:
+
+        </div>
+
+
+        <div class="radio-box">
+
+            "POSSIBLE JAPANESE FLEET SOMEWHERE
+            ONE-FIVE-ZERO TO TWO-HUNDRED MILES
+            NORTHWEST. RECON AIRCRAFT LIMITED."
+
+        </div>
+
+
+        <div class="brief-text">
+
+            The search area has been divided into six sectors.
+
+            Select the most productive search sector and
+            then determine how much of your limited
+            reconnaissance force to commit.
+
+        </div>
+
+
+        <div class="map-container"
+             style="margin-top:10px;background:#9ba8a0">
+
+            <div style="
+                display:grid;
+                grid-template-columns:repeat(3,1fr);
+                grid-template-rows:repeat(2,1fr);
+                min-height:330px;
+            ">
+
+                ${["A","B","C","D","E","F"].map(letter=>`
+
+                    <button
+                        onclick="reconSector('${letter}')"
+                        style="
+                        background:rgba(210,215,194,.35);
+                        border:1px solid #59635d;
+                        font-family:monospace;
+                        font-size:28px;
+                        font-weight:bold;
+                        cursor:pointer;
+                        color:#27312e;
+                        "
+                    >
+                        ${letter}
+                    </button>
+
+                `).join("")}
+
+            </div>
+
+        </div>
+
+
+        <div id="reconFeedback"></div>
+
+    </section>
+
+    `;
+
+}
+
+
+function reconSector(letter){
+
+    const feedback=document.getElementById("reconFeedback");
+
+    if(letter==="B"){
+
+        awardMission("E",9);
+
+        feedback.innerHTML=`
+
+        <div class="directive-box">
+
+            <div class="directive-label">
+                RECONNAISSANCE JUDGMENT ACCEPTED
+            </div>
+
+            <div class="directive">
+
+                Sector B provides the strongest
+                search opportunity given the reported
+                bearing and range.
+
+                You avoided wasting aircraft by
+                concentrating the search.
+
+                <br><br>
+
+                SCORE: <strong>9/10</strong>
+
+            </div>
+
+        </div>
+
+        `;
+
+    }
+
+    else{
+
+        feedback.innerHTML=`
+
+        <div class="warning">
+
+            SEARCH SECTOR INEFFICIENT.
+
+            The contact report gives you a bearing
+            and distance estimate. Use both.
+
+        </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   MISSION F
+   ========================================================= */
+
+function renderF(){
+
+    content.innerHTML=`
+
+    <section class="paper-panel">
+
+        <div class="panel-heading">
+
+            <h2>
+                MISSION F — RADIO INTELLIGENCE
+            </h2>
+
+            <div class="panel-code">
+                RADIO CIRCUIT
+            </div>
+
+        </div>
+
+
+        <div class="brief-text">
+
+            The following reports arrive within minutes.
+
+            No single message gives you the complete picture.
+
+            Your task is to determine:
+
+            <strong>
+            WHO • WHERE • WHAT • URGENCY
+            </strong>
+
+        </div>
+
+
+        <div class="directive-box">
+
+            <div class="directive">
+
+                REPORT 1
+
+                <br>
+
+                "CONTACT... BEARING ZERO-NINE-ZERO..."
+
+                <br><br>
+
+                REPORT 2
+
+                <br>
+
+                "MULTIPLE AIRCRAFT... HEADING SOUTH..."
+
+                <br><br>
+
+                REPORT 3
+
+                <br>
+
+                "CARRIER... POSITION APPROXIMATE..."
+
+            </div>
+
+        </div>
+
+
+        <div class="choices">
+
+            <button class="choice"
+                    onclick="radioChoice(1)">
+
+                A — Treat the reports as unrelated and wait
+                for complete information.
+
+            </button>
+
+            <button class="choice"
+                    onclick="radioChoice(2)">
+
+                B — Correlate the reports, establish the most
+                likely enemy bearing and prepare reconnaissance
+                and defensive measures.
+
+            </button>
+
+            <button class="choice"
+                    onclick="radioChoice(3)">
+
+                C — Assume the aircraft are friendly and
+                redirect the fighter patrol elsewhere.
+
+            </button>
+
+        </div>
+
+
+        <div id="radioFeedback"></div>
+
+    </section>
+
+    `;
+
+}
+
+
+function radioChoice(n){
+
+    const f=document.getElementById("radioFeedback");
+
+    if(n===2){
+
+        awardMission("F",10);
+
+        f.innerHTML=`
+
+        <div class="directive-box">
+
+            <div class="directive-label">
+                INTELLIGENCE CORRELATION ACCEPTED
+            </div>
+
+            <div class="directive">
+
+                Correct.
+
+                In carrier warfare, fragmented reports
+                must be fused into a usable tactical picture.
+
+                <br><br>
+
+                SCORE: <strong>10/10</strong>
+
+            </div>
+
+        </div>
+
+        `;
+
+    }
+
+    else{
+
+        f.innerHTML=`
+
+        <div class="warning">
+
+            NEGATIVE.
+
+            A commander cannot demand perfect information
+            before acting. Correlate what is available.
+
+        </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   MISSION G
+   ========================================================= */
+
+function renderG(){
+
+    content.innerHTML=`
+
+    <section class="paper-panel">
+
+        <div class="panel-heading">
+
+            <h2>
+                MISSION G — STRIKE PLANNING
+            </h2>
+
+            <div class="panel-code">
+                ENEMY TASK FORCE LOCATED
+            </div>
+
+        </div>
+
+
+        <div class="mission-brief">
+
+            <div>
+
+                <div class="brief-text">
+
+                    Reconnaissance has located a Japanese
+                    carrier task force.
+
+                    <br><br>
+
+                    <strong>
+                    FOUR AIRCRAFT CARRIERS
+                    </strong>
+
+                    <br>
+                    TWO BATTLESHIPS
+                    <br>
+                    FOUR CRUISERS
+                    <br>
+                    DESTROYERS
+
+                    <br><br>
+
+                    Your available aircraft for this exercise:
+
+                    <br>
+                    12 F4F Wildcats
+                    <br>
+                    18 SBD Dauntless
+                    <br>
+                    12 TBD Devastators
+
+                    <br><br>
+
+                    These numbers represent the exercise
+                    allocation, not a historical order of
+                    battle.
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <img
+                    class="brief-image"
+                    src="${IMG.zuikaku}">
+
+                <div class="image-caption">
+
+                    IJN aircraft carrier Zuikaku,
+                    photographed in 1941.
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="directive-box">
+
+            <div class="directive-label">
+                PART I — PRIMARY TARGET
+            </div>
+
+            <div class="directive">
+
+                Select the target whose destruction most
+                directly reduces the enemy's ability to
+                conduct carrier warfare.
+
+            </div>
+
+        </div>
+
+
+        <div class="choices">
+
+            <button class="choice"
+                    onclick="strikeTarget(1)">
+                A — Enemy carriers
+            </button>
+
+            <button class="choice"
+                    onclick="strikeTarget(2)">
+                B — Battleships
+            </button>
+
+            <button class="choice"
+                    onclick="strikeTarget(3)">
+                C — Cruisers
+            </button>
+
+            <button class="choice"
+                    onclick="strikeTarget(4)">
+                D — Destroyers
+            </button>
+
+            <button class="choice"
+                    onclick="strikeTarget(5)">
+                E — Aircraft parked on the enemy carrier
+            </button>
+
+        </div>
+
+
+        <div id="strikeFeedback"></div>
+
+    </section>
+
+    `;
+
+}
+
+
+function strikeTarget(n){
+
+    const f=document.getElementById("strikeFeedback");
+
+    if(n===1){
+
+        f.innerHTML=`
+
+        <div class="directive-box">
+
+            <div class="directive-label">
+                PRIMARY TARGET SELECTED
+            </div>
+
+            <div class="directive">
+
+                Enemy carriers are the decisive target because
+                they are the mobile aviation bases capable of
+                striking your force.
+
+                <br><br>
+
+                Now determine the composition of the strike.
+
+                <div class="choices">
+
+                    <button class="choice"
+                            onclick="strikeComposition(1)">
+
+                        A — Balanced strike with fighter escort,
+                        dive bombers and torpedo aircraft while
+                        retaining a carrier defense reserve.
+
+                    </button>
+
+                    <button class="choice"
+                            onclick="strikeComposition(2)">
+
+                        B — Commit nearly the entire air group
+                        to maximize the first strike.
+
+                    </button>
+
+                    <button class="choice"
+                            onclick="strikeComposition(3)">
+
+                        C — Send primarily fighters with a
+                        small number of bombers.
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        `;
+
+    }
+
+    else{
+
+        f.innerHTML=`
+
+        <div class="warning">
+
+            TARGET PRIORITY REJECTED.
+
+            The enemy's carriers are the principal mobile
+            source of Japanese naval air power.
+
+        </div>
+
+        `;
+
+    }
+
+}
+
+
+function strikeComposition(n){
+
+    const f=document.getElementById("strikeFeedback");
+
+    if(n===1){
+
+        awardMission("G",10);
+
+        f.innerHTML=`
+
+        <div class="directive-box">
+
+            <div class="directive-label">
+                STRIKE PLAN APPROVED
+            </div>
+
+            <div class="directive">
+
+                The strike concentrates force against the
+                enemy carrier force while retaining enough
+                fighters and aircraft to defend the carrier.
+
+                <br><br>
+
+                SCORE: <strong>10/10</strong>
+
+            </div>
+
+        </div>
+
+        `;
+
+    }
+
+    else{
+
+        f.innerHTML=`
+
+        <div class="warning">
+
+            STRIKE PLAN REJECTED.
+
+            A carrier commander must preserve enough
+            combat power to survive the enemy's response.
+
+        </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   MISSION H
+   ========================================================= */
+
+function renderH(){
+
+    content.innerHTML=`
+
+    <section class="paper-panel">
+
+        <div class="panel-heading">
+
+            <h2>
+                MISSION H — CARRIER DEFENSE
+            </h2>
+
+            <div class="panel-code">
+                RADAR CONTACT // 35 MILES
+            </div>
+
+        </div>
+
+
+        <div class="mission-brief">
+
+            <div>
+
+                <div class="brief-text">
+
+                    Enemy aircraft are approaching.
+
+                    Your fighters are limited.
+
+                    Your strike aircraft may still be
+                    returning.
+
+                    The carrier cannot afford to have the
+                    entire fighter force committed too far
+                    from the task force.
+
+                </div>
+
+                <div class="radio-box">
+
+                    "RADAR CONTACT. MULTIPLE AIRCRAFT.
+                    RANGE THREE-FIVE MILES."
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <img
+                    class="brief-image"
+                    src="${IMG.wildcat}">
+
+                <div class="image-caption">
+                    F4F-3 Wildcat, February 1942.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="choices">
+
+            <button class="choice"
+                    onclick="defenseChoice(1)">
+
+                A — Establish CAP ahead of the carrier while
+                retaining a fighter reserve near the task force.
+
+            </button>
+
+            <button class="choice"
+                    onclick="defenseChoice(2)">
+
+                B — Send every available fighter far forward
+                and leave no reserve.
+
+            </button>
+
+            <button class="choice"
+                    onclick="defenseChoice(3)">
+
+                C — Keep all fighters aboard until the enemy
+                reaches visual range.
+
+            </button>
+
+        </div>
+
+
+        <div id="defenseFeedback"></div>
+
+    </section>
+
+    `;
+
+}
+
+
+function defenseChoice(n){
+
+    const f=document.getElementById("defenseFeedback");
+
+    if(n===1){
+
+        awardMission("H",10);
+
+        f.innerHTML=`
+
+        <div class="directive-box">
+
+            <div class="directive-label">
+                DEFENSIVE PLAN APPROVED
+            </div>
+
+            <div class="directive">
+
+                Correct.
+
+                CAP provides early interception while the
+                reserve preserves flexibility.
+
+                <br><br>
+
+                SCORE: <strong>10/10</strong>
+
+            </div>
+
+        </div>
+
+        `;
+
+    }
+
+    else{
+
+        f.innerHTML=`
+
+        <div class="warning">
+
+            DEFENSIVE PLAN REJECTED.
+
+            A carrier commander must avoid exhausting
+            the defensive fighter force before the threat
+            is fully understood.
+
+        </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   MISSION I
+   ========================================================= */
+
+function renderI(){
+
+    content.innerHTML=`
+
+    <section class="paper-panel">
+
+        <div class="panel-heading">
+
+            <h2>
+                MISSION I — TASK FORCE FORMATION
+            </h2>
+
+            <div class="panel-code">
+                FORMATION DRILL
+            </div>
+
+        </div>
+
+
+        <div class="brief-text">
+
+            You have the following units:
+
+            <strong>
+            CARRIER • BATTLESHIP • CRUISER • DESTROYERS
+            </strong>
+
+            Construct a layered formation.
+
+            Drag the ships into position around the carrier.
+
+            The carrier is the high-value unit.
+
+        </div>
+
+
+        <div
+            id="formationBoard"
+            class="formation-board">
+
+            <div class="formation-grid"></div>
+
+            <div
+                class="ship-token carrier"
+                draggable="true"
+                id="carrierToken"
+                style="left:43%;top:43%">
+                CARRIER
+            </div>
+
+            <div
+                class="ship-token"
+                draggable="true"
+                style="left:15%;top:25%">
+                BB
+            </div>
+
+            <div
+                class="ship-token cruiser"
+                draggable="true"
+                style="left:68%;top:24%">
+                CA/CL
+            </div>
+
+            <div
+                class="ship-token destroyer"
+                draggable="true"
+                style="left:20%;top:68%">
+                DD
+            </div>
+
+            <div
+                class="ship-token destroyer"
+                draggable="true"
+                style="left:70%;top:68%">
+                DD
+            </div>
+
+        </div>
+
+
+        <div class="radio-box">
+
+            "Keep the carrier protected by layered screening
+            forces. Do not bunch the screen so tightly that
+            it loses maneuvering room."
+
+        </div>
+
+
+        <button
+            class="action"
+            onclick="formationCheck()">
+
+            REPORT FORMATION
+
+        </button>
+
+
+        <div id="formationFeedback"></div>
+
+    </section>
+
+    `;
+
+
+    let drag=null;
+
+    document
+    .querySelectorAll(".ship-token")
+    .forEach(token=>{
+
+        token.addEventListener("dragstart",()=>{
+            drag=token;
+        });
+
+    });
+
+
+    const board=document.getElementById("formationBoard");
+
+    board.addEventListener("dragover",e=>{
+        e.preventDefault();
+    });
+
+    board.addEventListener("drop",e=>{
+
+        e.preventDefault();
+
+        if(!drag)return;
+
+        const rect=board.getBoundingClientRect();
+
+        const x=
+            ((e.clientX-rect.left)/rect.width)*100;
+
+        const y=
+            ((e.clientY-rect.top)/rect.height)*100;
+
+        drag.style.left=
+            Math.max(2,Math.min(85,x))+"%";
+
+        drag.style.top=
+            Math.max(2,Math.min(85,y))+"%";
+
+    });
+
+}
+
+
+function formationCheck(){
+
+    const carrier=
+        document.getElementById("carrierToken");
+
+    const rect=
+        document.getElementById("formationBoard")
+        .getBoundingClientRect();
+
+    const cx=
+        parseFloat(carrier.style.left);
+
+    const cy=
+        parseFloat(carrier.style.top);
+
+    let good=0;
+
+    document
+    .querySelectorAll(".ship-token")
+    .forEach(t=>{
+
+        if(t===carrier)return;
+
+        const x=parseFloat(t.style.left);
+        const y=parseFloat(t.style.top);
+
+        const d=Math.sqrt(
+            Math.pow(x-cx,2)+
+            Math.pow(y-cy,2)
+        );
+
+        if(d>8 && d<35)
+            good++;
+
+    });
+
+
+    if(good>=3){
+
+        awardMission("I",10);
+
+        document.getElementById("formationFeedback")
+            .innerHTML=`
+
+            <div class="directive-box">
+
+                <div class="directive-label">
+                    FORMATION ACCEPTED
+                </div>
+
+                <div class="directive">
+
+                    The formation provides layered protection
+                    while maintaining maneuvering room.
+
+                    <br><br>
+
+                    SCORE: <strong>10/10</strong>
+
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+    else{
+
+        document.getElementById("formationFeedback")
+            .innerHTML=`
+
+            <div class="warning">
+
+                FORMATION UNSATISFACTORY.
+
+                The carrier requires layered protection.
+                Reposition the screen.
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   MISSION J
+   ========================================================= */
+
+function renderJ(){
+
+    content.innerHTML=`
+
+    <section class="paper-panel">
+
+        <div class="panel-heading">
+
+            <h2>
+                MISSION J — SURFACE THREAT
+            </h2>
+
+            <div class="panel-code">
+                SURFACE CONTACT
+            </div>
+
+        </div>
+
+
+        <div class="mission-brief">
+
+            <div>
+
+                <div class="brief-text">
+
+                    Your radio room reports an enemy surface
+                    force approaching.
+
+                    The carrier is a mobile airfield.
+
+                    It is not designed to win a close-range
+                    gun duel with an enemy surface force.
+
+                    Your surface escorts exist to help keep
+                    that fight away from the carrier.
+
+                </div>
+
+                <div class="radio-box">
+
+                    "CONTACT — SURFACE FORCE.
+                    RANGE CLOSING."
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <img
+                    class="brief-image"
+                    src="${IMG.northCarolina}">
+
+                <div class="image-caption">
+                    USS North Carolina, 1942.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="choices">
+
+            <button class="choice"
+                    onclick="surfaceChoice(1)">
+
+                A — Withdraw the carrier, maintain distance,
+                and use destroyers/cruisers as a screen.
+
+            </button>
+
+            <button class="choice"
+                    onclick="surfaceChoice(2)">
+
+                B — Close directly with the enemy surface force
+                using the carrier as the principal surface
+                combatant.
+
+            </button>
+
+            <button class="choice"
+                    onclick="surfaceChoice(3)">
+
+                C — Scatter the force and allow the enemy to
+                determine the range of engagement.
+
+            </button>
+
+        </div>
+
+
+        <div id="surfaceFeedback"></div>
+
+    </section>
+
+    `;
+
+}
+
+
+function surfaceChoice(n){
+
+    const f=document.getElementById("surfaceFeedback");
+
+    if(n===1){
+
+        awardMission("J",9);
+
+        f.innerHTML=`
+
+        <div class="directive-box">
+
+            <div class="directive-label">
+                CARRIER PRESERVATION ACCEPTED
+            </div>
+
+            <div class="directive">
+
+                Correct.
+
+                The carrier's greatest offensive weapon is
+                its aircraft. Preserve the carrier and use
+                the surface screen to prevent an enemy
+                surface force from closing.
+
+                <br><br>
+
+                SCORE: <strong>9/10</strong>
+
+            </div>
+
+        </div>
+
+        `;
+
+    }
+
+    else{
+
+        f.innerHTML=`
+
+        <div class="warning">
+
+            COMMAND REJECTED.
+
+            You are exposing the carrier to the kind of
+            surface engagement its air group is intended
+            to prevent.
+
+        </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   MISSION K
+   ========================================================= */
+
+function renderK(){
+
+    content.innerHTML=`
+
+    <section class="paper-panel">
+
+        <div class="panel-heading">
+
+            <h2>
+                MISSION K — DAMAGE CONTROL
+            </h2>
+
+            <div class="panel-code">
+                CASUALTY REPORT
+            </div>
+
+        </div>
+
+
+        <div class="mission-brief">
+
+            <div>
+
+                <div class="brief-text">
+
+                    Your carrier has been hit.
+
+                    <br><br>
+
+                    DAMAGE REPORT:
+
+                    <br>
+                    • Flight deck damage
+                    <br>
+                    • Fuel fire
+                    <br>
+                    • Engineering casualty
+                    <br>
+                    • Communications damaged
+
+                    <br><br>
+
+                    You must establish priorities.
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <img
+                    class="brief-image"
+                    src="${IMG.damage}">
+
+                <div class="image-caption">
+
+                    USS Yorktown flight deck after Japanese
+                    attack at Midway, 4 June 1942.
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="choices">
+
+            <button class="choice"
+                    onclick="damageChoice(1)">
+
+                A — Fight the fuel fire, isolate the damaged
+                area, protect engineering and restore essential
+                communications.
+
+            </button>
+
+            <button class="choice"
+                    onclick="damageChoice(2)">
+
+                B — Prioritize cosmetic flight-deck repair
+                before controlling the fuel fire.
+
+            </button>
+
+            <button class="choice"
+                    onclick="damageChoice(3)">
+
+                C — Abandon engineering priorities and send
+                every available crewman to communications.
+
+            </button>
+
+        </div>
+
+
+        <div id="damageFeedback"></div>
+
+    </section>
+
+    `;
+
+}
+
+
+function damageChoice(n){
+
+    const f=document.getElementById("damageFeedback");
+
+    if(n===1){
+
+        awardMission("K",10);
+
+        f.innerHTML=`
+
+        <div class="directive-box">
+
+            <div class="directive-label">
+                DAMAGE CONTROL PRIORITY ACCEPTED
+            </div>
+
+            <div class="directive">
+
+                Correct.
+
+                Life safety, fire control, propulsion,
+                electrical power and essential communications
+                take priority over cosmetic repair.
+
+                <br><br>
+
+                SCORE: <strong>10/10</strong>
+
+            </div>
+
+        </div>
+
+        `;
+
+    }
+
+    else{
+
+        f.innerHTML=`
+
+        <div class="warning">
+
+            DAMAGE CONTROL PRIORITY REJECTED.
+
+            A carrier cannot return to combat if a fire or
+            engineering casualty is allowed to grow.
+
+        </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   MISSION L
+   ========================================================= */
+
+function renderL(){
+
+    content.innerHTML=`
+
+    <section class="paper-panel">
+
+        <div class="panel-heading">
+
+            <h2>
+                MISSION L — AIRCRAFT RECOVERY
+            </h2>
+
+            <div class="panel-code">
+                AIR GROUP RETURNING
+            </div>
+
+        </div>
+
+
+        <div class="brief-text">
+
+            Your strike aircraft are returning.
+
+            Some are damaged.
+
+            Some have limited fuel.
+
+            The flight deck has limited space.
+
+            Enemy aircraft may still be nearby.
+
+            Carrier warfare is a continuous cycle:
+
+        </div>
+
+
+        <div class="directive-box">
+
+            <div class="directive"
+                 style="text-align:center;font-size:18px">
+
+                LAUNCH
+
+                →
+
+                STRIKE
+
+                →
+
+                RETURN
+
+                →
+
+                RECOVER
+
+                →
+
+                REARM
+
+                →
+
+                LAUNCH
+
+            </div>
+
+        </div>
+
+
+        <div class="choices">
+
+            <button class="choice"
+                    onclick="recoveryChoice(1)">
+
+                A — Give priority to low-fuel and damaged
+                aircraft, maintain a controlled recovery cycle,
+                and preserve the deck for emergency action.
+
+            </button>
+
+            <button class="choice"
+                    onclick="recoveryChoice(2)">
+
+                B — Recover the aircraft in arbitrary order
+                to keep the deck cycle moving quickly.
+
+            </button>
+
+            <button class="choice"
+                    onclick="recoveryChoice(3)">
+
+                C — Refuse recovery until every returning
+                aircraft is visually identified.
+
+            </button>
+
+        </div>
+
+
+        <div id="recoveryFeedback"></div>
+
+    </section>
+
+    `;
+
+}
+
+
+function recoveryChoice(n){
+
+    const f=document.getElementById("recoveryFeedback");
+
+    if(n===1){
+
+        awardMission("L",10);
+
+        f.innerHTML=`
+
+        <div class="directive-box">
+
+            <div class="directive-label">
+                RECOVERY PROCEDURE ACCEPTED
+            </div>
+
+            <div class="directive">
+
+                Correct.
+
+                Fuel state and aircraft condition determine
+                recovery priority.
+
+                <br><br>
+
+                SCORE: <strong>10/10</strong>
+
+            </div>
+
+        </div>
+
+        `;
+
+    }
+
+    else{
+
+        f.innerHTML=`
+
+        <div class="warning">
+
+            RECOVERY PROCEDURE REJECTED.
+
+            A carrier cannot treat every returning aircraft
+            as if its fuel and damage state were identical.
+
+        </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   MISSION M — FINAL COMMAND
+   ========================================================= */
+
+function renderM(){
+
+    content.innerHTML=`
+
+    <section class="paper-panel">
+
+        <div class="panel-heading">
+
+            <h2>
+                MISSION M — FINAL COMMAND
+            </h2>
+
+            <div class="panel-code">
+                PACIFIC CARRIER BATTLE
+            </div>
+
+        </div>
+
+
+        <div class="brief-text">
+
+            This is no longer a conventional qualification
+            exercise.
+
+            You are now the commander.
+
+            The opposing force will react to your decisions.
+
+            The battlefield will remember what you have done.
+
+            <br><br>
+
+            This is a fictional command simulation using
+            historically grounded ships, aircraft and
+            operational principles.
+
+        </div>
+
+
+        <div class="battle-status">
+
+            <div class="force-box">
+
+                <div class="force-title">
+                    UNITED STATES TASK FORCE
+                </div>
+
+                <div class="force-value">
+                    CARRIER READY
+                </div>
+
+                <div class="mono">
+                    AIRCRAFT:
+                    <span id="usAircraft">42</span>
+                    <br>
+                    CARRIER:
+                    <span id="usCarrier">100</span>%
+                    <br>
+                    FUEL:
+                    <span id="usFuel">100</span>%
+                    <br>
+                    INTELLIGENCE:
+                    <span id="usIntel">50</span>%
+                </div>
+
+            </div>
+
+
+            <div class="force-box">
+
+                <div class="force-title">
+                    JAPANESE TASK FORCE
+                </div>
+
+                <div class="force-value">
+                    FOUR CARRIERS
+                </div>
+
+                <div class="mono">
+                    CARRIERS:
+                    <span id="jpCarriers">4</span>
+                    <br>
+                    AIRCRAFT:
+                    <span id="jpAircraft">40</span>
+                    <br>
+                    CAP:
+                    <span id="jpCAP">100</span>%
+                    <br>
+                    INTELLIGENCE:
+                    <span id="jpIntel">50</span>%
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="command-clock"
+            id="battleClock">
+            20
+        </div>
+
+
+        <div class="brief-label">
+            SELECT THREE COMMANDS
+        </div>
+
+
+        <div class="command-grid">
+
+            <button class="command-button"
+                    onclick="battleCommand('MOVE')">
+                MOVE
+            </button>
+
+            <button class="command-button"
+                    onclick="battleCommand('SEARCH')">
+                SEARCH
+            </button>
+
+            <button class="command-button"
+                    onclick="battleCommand('LAUNCH')">
+                LAUNCH
+            </button>
+
+            <button class="command-button"
+                    onclick="battleCommand('STRIKE')">
+                STRIKE
+            </button>
+
+            <button class="command-button"
+                    onclick="battleCommand('CAP')">
+                CAP
+            </button>
+
+            <button class="command-button"
+                    onclick="battleCommand('DEFEND')">
+                DEFEND
+            </button>
+
+            <button class="command-button"
+                    onclick="battleCommand('RECOVER')">
+                RECOVER
+            </button>
+
+            <button class="command-button"
+                    onclick="battleCommand('REPAIR')">
+                REPAIR
+            </button>
+
+            <button class="command-button"
+                    onclick="battleCommand('WITHDRAW')">
+                WITHDRAW
+            </button>
+
+            <button class="command-button"
+                    onclick="battleCommand('RADIO')">
+                RADIO
+            </button>
+
+        </div>
+
+
+        <div
+            class="battle-log"
+            id="battleLog">
+
+            <div>
+                FLAG BRIDGE: Awaiting your first command.
+            </div>
+
+        </div>
+
+
+        <button
+            class="action"
+            id="battleStart"
+            onclick="startBattleRound()">
+
+            BEGIN COMMAND CLOCK
+
+        </button>
+
+
+        <div id="battleFeedback"></div>
+
+    </section>
+
+    `;
+
+    updateBattleDisplay();
+
+}
+
+
+function updateBattleDisplay(){
+
+    const a=document.getElementById("usAircraft");
+
+    if(!a)return;
+
+    a.textContent=state.americanAircraft;
+
+    document.getElementById("usCarrier")
+        .textContent=state.carrier;
+
+    document.getElementById("usFuel")
+        .textContent=state.fuel;
+
+    document.getElementById("usIntel")
+        .textContent=state.intelligence;
+
+    document.getElementById("jpCarriers")
+        .textContent=state.enemyCarriers;
+
+    document.getElementById("jpAircraft")
+        .textContent=state.enemyAircraft;
+
+}
+
+
+function battleLog(message){
+
+    const box=document.getElementById("battleLog");
+
+    const line=document.createElement("div");
+
+    line.textContent=
+        "ROUND "+(state.battleRound+1)+" // "+message;
+
+    box.prepend(line);
+
+}
+
+
+function startBattleRound(){
+
+    state.battleCommands=[];
+
+    state.battleSeconds=20;
+
+    const clock=document.getElementById("battleClock");
+
+    document.getElementById("battleStart")
+        .disabled=true;
+
+    document
+    .querySelectorAll(".command-button")
+    .forEach(b=>b.classList.remove("selected"));
+
+    clock.textContent=20;
+
+    clearInterval(state.battleTimer);
+
+    state.battleTimer=setInterval(()=>{
+
+        state.battleSeconds--;
+
+        clock.textContent=
+            state.battleSeconds;
+
+        if(state.battleSeconds<=0){
+
+            clearInterval(state.battleTimer);
+
+            resolveBattleRound();
+
+        }
+
+    },1000);
+
+}
+
+
+function battleCommand(command){
+
+    if(
+        state.battleSeconds<=0 ||
+        state.battleCommands.length>=3
+    )
+        return;
+
+    state.battleCommands.push(command);
+
+    document
+    .querySelectorAll(".command-button")
+    .forEach(b=>{
+
+        if(b.textContent.trim()===command)
+            b.classList.add("selected");
+
+    });
+
+    battleLog(
+        "AMERICAN COMMAND: "+command
+    );
+
+    if(state.battleCommands.length>=3){
+
+        clearInterval(state.battleTimer);
+
+        resolveBattleRound();
+
+    }
+
+}
+
+
+function resolveBattleRound(){
+
+    state.battleRound++;
+
+    const commands=state.battleCommands;
+
+    let success=0;
+
+
+    /*
+       Historically grounded command logic:
+       reconnaissance improves intelligence;
+       launch creates offensive potential;
+       CAP protects the carrier;
+       strike damages enemy carriers;
+       recovery preserves the air group;
+       repair protects carrier readiness;
+       withdrawal protects the force but sacrifices
+       offensive initiative.
+    */
+
+
+    if(commands.includes("SEARCH")){
+
+        state.intelligence=
+            Math.min(100,state.intelligence+15);
+
+        success++;
+
+        battleLog(
+            "Reconnaissance improves the tactical picture."
+        );
+
+    }
+
+
+    if(commands.includes("RADIO")){
+
+        state.intelligence=
+            Math.min(100,state.intelligence+10);
+
+        success++;
+
+        battleLog(
+            "Radio intelligence correlates available reports."
+        );
+
+    }
+
+
+    if(commands.includes("LAUNCH")){
+
+        if(state.americanAircraft>=8){
+
+            state.americanAircraft-=2;
+
+            battleLog(
+                "Aircraft are launched. A portion of the air group is committed."
+            );
+
+        }
+
+        success++;
+
+    }
+
+
+    if(commands.includes("STRIKE")){
+
+        if(
+            state.intelligence>=45 &&
+            state.americanAircraft>=6
+        ){
+
+            state.enemyCarriers=
+                Math.max(
+                    0,
+                    state.enemyCarriers-1
+                );
+
+            state.enemyAircraft=
+                Math.max(
+                    0,
+                    state.enemyAircraft-7
+                );
+
+            state.americanAircraft=
+                Math.max(
+                    0,
+                    state.americanAircraft-4
+                );
+
+            success+=2;
+
+            battleLog(
+                "Strike reaches the enemy force. One enemy carrier is rendered combat ineffective."
+            );
+
+        }
+        else{
+
+            state.americanAircraft=
+                Math.max(
+                    0,
+                    state.americanAircraft-3
+                );
+
+            battleLog(
+                "Strike launched with inadequate intelligence. Losses increase."
+            );
+
+        }
+
+    }
+
+
+    if(commands.includes("CAP")){
+
+        state.carrier=
+            Math.min(
+                100,
+                state.carrier+3
+            );
+
+        state.enemyAircraft=
+            Math.max(
+                0,
+                state.enemyAircraft-3
+            );
+
+        success++;
+
+        battleLog(
+            "CAP intercepts part of the incoming threat."
+        );
+
+    }
+
+
+    if(commands.includes("DEFEND")){
+
+        state.carrier=
+            Math.min(
+                100,
+                state.carrier+5
+            );
+
+        success++;
+
+        battleLog(
+            "Task-force defenses are concentrated."
+        );
+
+    }
+
+
+    if(commands.includes("REPAIR")){
+
+        state.carrier=
+            Math.min(
+                100,
+                state.carrier+10
+            );
+
+        success++;
+
+        battleLog(
+            "Damage-control parties improve carrier readiness."
+        );
+
+    }
+
+
+    if(commands.includes("RECOVER")){
+
+        state.americanAircraft=
+            Math.min(
+                42,
+                state.americanAircraft+3
+            );
+
+        success++;
+
+        battleLog(
+            "Returning aircraft are recovered."
+        );
+
+    }
+
+
+    if(commands.includes("MOVE")){
+
+        state.fuel=
+            Math.max(
+                0,
+                state.fuel-5
+            );
+
+        success++;
+
+        battleLog(
+            "Task force changes position."
+        );
+
+    }
+
+
+    if(commands.includes("WITHDRAW")){
+
+        state.fuel=
+            Math.max(
+                0,
+                state.fuel-3
+            );
+
+        state.carrier=
+            Math.min(
+                100,
+                state.carrier+8
+            );
+
+        success++;
+
+        battleLog(
+            "Task force withdraws toward a safer operating area."
+        );
+
+    }
+
+
+    /*
+       Opposing force response
+    */
+
+    if(state.enemyCarriers>0){
+
+        const enemyAction=
+            state.battleRound%3===0
+            ?
+            "STRIKE"
+            :
+            (
+                state.battleRound%2===0
+                ?
+                "CAP"
+                :
+                "SEARCH"
+            );
+
+
+        if(enemyAction==="STRIKE"){
+
+            if(
+                !commands.includes("CAP") &&
+                !commands.includes("DEFEND")
+            ){
+
+                state.carrier=
+                    Math.max(
+                        0,
+                        state.carrier-12
+                    );
+
+                battleLog(
+                    "OPPOSING FORCE STRIKE: carrier damage sustained."
+                );
+
+            }
+            else{
+
+                battleLog(
+                    "OPPOSING FORCE STRIKE: defensive fighters and ships reduce the attack."
+                );
+
+            }
+
+        }
+
+        if(enemyAction==="CAP"){
+
+            state.jpCAP=
+                Math.max(
+                    20,
+                    (state.jpCAP||100)-5
+                );
+
+            battleLog(
+                "Japanese CAP is repositioned."
+            );
+
+        }
+
+        if(enemyAction==="SEARCH"){
+
+            state.jpIntel=
+                Math.min(
+                    100,
+                    (state.jpIntel||50)+8
+                );
+
+            battleLog(
+                "Japanese reconnaissance improves."
+            );
+
+        }
+
+    }
+
+
+    updateBattleDisplay();
+
+
+    const feedback=
+        document.getElementById("battleFeedback");
+
+    if(
+        state.enemyCarriers<=0 ||
+        state.enemyAircraft<=0
+    ){
+
+        clearInterval(state.battleTimer);
+
+        awardMission("M",10);
+
+        feedback.innerHTML=`
+
+        <div class="evaluation">
+
+            <div class="directive-label">
+                ENEMY CARRIER FORCE DEFEATED
+            </div>
+
+            <div class="rating">
+                PACIFIC FLEET COMMANDER
+            </div>
+
+            <div class="document-text">
+
+                Your command decisions have reduced the opposing
+                force's carrier capability below operational
+                effectiveness.
+
+                <br><br>
+
+                The qualification board will now generate
+                your final command evaluation.
+
+            </div>
+
+            <button
+                class="action"
+                onclick="showFinalEvaluation()">
+
+                ISSUE COMMANDER EVALUATION
+
+            </button>
+
+        </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    if(
+        state.carrier<=0 ||
+        state.fuel<=0 ||
+        state.americanAircraft<=0
+    ){
+
+        feedback.innerHTML=`
+
+        <div class="warning">
+
+            AMERICAN TASK FORCE COMBAT INEFFECTIVE.
+
+            The exercise is terminated.
+
+            Review your use of reconnaissance,
+            CAP, strike timing and carrier preservation.
+
+        </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    if(state.battleRound>=6){
+
+        awardMission(
+            "M",
+            Math.min(9,7+Math.floor(success/2))
+        );
+
+        feedback.innerHTML=`
+
+        <div class="directive-box">
+
+            <div class="directive-label">
+                COMMAND EXERCISE COMPLETE
+            </div>
+
+            <div class="directive">
+
+                The opposing force remains capable of combat,
+                but your task force has survived the exercise.
+
+                Your command performance has been recorded.
+
+                <br><br>
+
+                Mission M score:
+                <strong>
+                ${state.score.M}/10
+                </strong>
+
+            </div>
+
+        </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    document.getElementById("battleStart")
+        .disabled=false;
+
+    document.getElementById("battleStart")
+        .textContent=
+        "BEGIN NEXT COMMAND CLOCK";
+
+}
+
+
+/* =========================================================
+   FINAL EVALUATION
+   ========================================================= */
+
+function showFinalEvaluation(){
+
+    const scores={...state.score};
+
+    const categories=[
+
+        ["Navigation","C",10],
+        ["Ship Identification","B",10],
+        ["Flight Deck Operations","D",10],
+        ["Reconnaissance","E",10],
+        ["Radio Intelligence","F",10],
+        ["Strike Planning","G",10],
+        ["Carrier Defense","H",10],
+        ["Task Force Formation","I",10],
+        ["Surface Threat","J",10],
+        ["Damage Control","K",10],
+        ["Aircraft Recovery","L",10],
+        ["Final Command","M",10]
+
+    ];
+
+
+    let total=0;
+
+    categories.forEach(c=>{
+
+        total+=
+            scores[c[1]]||
+            0;
+
+    });
+
+
+    let rating="COMMANDER IN TRAINING";
+
+    if(total>=105)
+        rating="FLEET ADMIRAL";
+
+    else if(total>=92)
+        rating="CARRIER COMMANDER";
+
+    else if(total>=78)
+        rating="TASK FORCE COMMANDER";
+
+    else if(total>=60)
+        rating="EXECUTIVE OFFICER";
+
+
+    content.innerHTML=`
+
+    <section class="paper-panel">
+
+        <div class="panel-heading">
+
+            <h2>
+                COMMANDER'S FINAL EVALUATION
+            </h2>
+
+            <div class="panel-code">
+                PC-42-CQ // FINAL
+            </div>
+
+        </div>
+
+
+        <div class="evaluation">
+
+            <div class="brief-label">
+                UNITED STATES PACIFIC FLEET
+            </div>
+
+            <div class="rating">
+                ${rating}
+            </div>
+
+            <div class="document-text">
+
+                Candidate performance has been recorded
+                across the carrier command qualification
+                sequence.
+
+            </div>
+
+
+            <table class="eval-table">
+
+                ${categories.map(c=>`
+
+                    <tr>
+
+                        <td>
+                            ${c[0]}
+                        </td>
+
+                        <td style="text-align:right">
+
+                            ${
+                                scores[c[1]]||
+                                "—"
+                            }
+
+                            /10
+
+                        </td>
+
+                    </tr>
+
+                `).join("")}
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            COMMAND TOTAL
+                        </strong>
+                    </td>
+
+                    <td style="text-align:right">
+
+                        <strong>
+                            ${total}/120
+                        </strong>
+
+                    </td>
+
+                </tr>
+
+            </table>
+
+
+            <div class="directive-box">
+
+                <div class="directive-label">
+                    FINAL COMMAND ASSESSMENT
+                </div>
+
+                <div class="directive">
+
+                    A carrier commander does not win by
+                    choosing the most aggressive action.
+
+                    A commander wins by understanding the
+                    entire system:
+
+                    intelligence,
+
+                    reconnaissance,
+
+                    aircraft,
+
+                    ships,
+
+                    communications,
+
+                    defense,
+
+                    damage control,
+
+                    recovery,
+
+                    and timing.
+
+                    <br><br>
+
+                    The Pacific Fleet requires officers who
+                    can make decisions while the information
+                    remains incomplete.
+
+                    <br><br>
+
+                    <strong>
+                    THAT IS THE STANDARD OF COMMAND.
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="signature">
+
+                Chester W. Nimitz
+
+            </div>
+
+            <div class="mono">
+
+                COMMANDER IN CHIEF
+                <br>
+                UNITED STATES PACIFIC FLEET
+
+            </div>
+
+        </div>
+
+    </section>
+
+    `;
+
+}
+
+
+/* =========================================================
+   AWARD MISSION
+   ========================================================= */
+
+function awardMission(id,score){
+
+    if(state.completed[id])
+        return;
+
+    state.score[id]=score;
+
+    state.completed[id]=true;
+
+    state.totalScore+=score;
+
+    renderBoard();
+
+}
+
+
+/* =========================================================
+   RENDER ROUTER
+   ========================================================= */
+
+function render(){
+
+    renderBoard();
+
+    if(currentMission==="OPENING")
+        renderOpening();
+
+    if(currentMission==="A")
+        renderA();
+
+    if(currentMission==="B")
+        renderB();
+
+    if(currentMission==="C")
+        renderC();
+
+    if(currentMission==="D")
+        renderD();
+
+    if(currentMission==="E")
+        renderE();
+
+    if(currentMission==="F")
+        renderF();
+
+    if(currentMission==="G")
+        renderG();
+
+    if(currentMission==="H")
+        renderH();
+
+    if(currentMission==="I")
+        renderI();
+
+    if(currentMission==="J")
+        renderJ();
+
+    if(currentMission==="K")
+        renderK();
+
+    if(currentMission==="L")
+        renderL();
+
+    if(currentMission==="M")
+        renderM();
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+render();
+
+</script>
+
+</body>
+</html>
